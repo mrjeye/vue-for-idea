@@ -1,19 +1,29 @@
-name: Sync Fork
+name: Fork Sync Automation
 on:
   schedule:
-    - cron: '0 12 * * *'  # 每天UTC时间12点运行
-  workflow_dispatch:  # 允许手动触发
+    - cron: '0 2 * * *'  # 每天UTC时间2点运行
+  workflow_dispatch:
 
 jobs:
-  sync:
+  sync-fork:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Sync Fork
-        uses: tgymnich/fork-sync@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          owner: springeye  # 原仓库所有者
-          repo: vue-for-idea  # 原仓库名称
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Sync with upstream
+        env:
+          UPSTREAM_REPO: springeye/vue-for-idea
+        run: |
+          git remote add upstream https://github.com/$UPSTREAM_REPO.git || true
+          git fetch upstream
+          git checkout main
+          git merge upstream/main
+          git push origin main
