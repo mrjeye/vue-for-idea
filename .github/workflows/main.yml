@@ -1,0 +1,19 @@
+name: Sync Fork
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 每天UTC时间12点运行
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Sync Fork
+        uses: tgymnich/fork-sync@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: springeye  # 原仓库所有者
+          repo: vue-for-idea  # 原仓库名称
